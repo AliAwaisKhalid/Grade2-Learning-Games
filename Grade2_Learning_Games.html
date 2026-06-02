@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 2 Learning Games — White Rose</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose:#E8445A;--rose-d:#C1253D;--rose-l:#FFF0F2;
+    --sky:#3B82F6;--sky-d:#1D4ED8;--sky-l:#EFF6FF;
+    --mint:#10B981;--mint-d:#047857;--mint-l:#ECFDF5;
+    --amber:#F59E0B;--amber-d:#B45309;--amber-l:#FFFBEB;
+    --purple:#8B5CF6;--purple-l:#F5F3FF;
+    --bg:#F8F4FF;--card:#FFFFFF;--text:#1E1B2E;--muted:#6B7280;--border:#E5E7EB;
+    --shadow:0 4px 24px rgba(0,0,0,0.08);--shadow-lg:0 8px 40px rgba(0,0,0,0.13);
+    --r:16px;--rs:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .topbar{background:linear-gradient(135deg,#E8445A 0%,#8B5CF6 100%);padding:12px 28px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 16px rgba(232,68,90,0.3);}
+  .topbar-logo{width:40px;height:40px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;color:#fff;}
+  .topbar-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff;}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .score-badge{background:rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;color:#fff;}
+  .app{display:flex;flex:1;overflow:hidden;height:calc(100vh - 64px);}
+  .sidebar{width:210px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:16px 10px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;}
+  .sl{font-family:'Nunito',sans-serif;font-weight:800;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin:10px 0 3px;}
+  .sl:first-child{margin-top:0;}
+  .nb{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;transition:all 0.15s;color:var(--text);font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;}
+  .nb:hover{background:var(--rose-l);color:var(--rose-d);}
+  .nb.active{background:var(--rose-l);color:var(--rose-d);}
+  .ni{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .nb.active .ni{background:var(--rose);}
+  .nb:not(.active) .ni{background:#F3F4F6;}
+  .nbadge{margin-left:auto;background:var(--border);border-radius:10px;padding:2px 7px;font-size:10px;color:var(--muted);font-weight:700;}
+  .nb.active .nbadge{background:rgba(232,68,90,0.15);color:var(--rose-d);}
+  .main{flex:1;overflow-y:auto;padding:24px 28px;}
+  .gc{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;max-width:740px;margin:0 auto;}
+  .gh{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1.5px solid var(--border);}
+  .ghi{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .ght{font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:var(--text);}
+  .ghs{font-size:12px;color:var(--muted);margin-top:2px;}
+  .pr{display:flex;gap:16px;margin-bottom:18px;align-items:center;}
+  .pp{background:#F3F4F6;border-radius:20px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;color:var(--muted);}
+  .pp span{color:var(--text);}
+  .pbw{flex:1;background:#F3F4F6;border-radius:6px;height:7px;}
+  .pb{height:7px;border-radius:6px;background:linear-gradient(90deg,var(--rose),var(--purple));transition:width 0.3s;}
+  .qt{font-family:'Nunito',sans-serif;font-weight:800;font-size:17px;color:var(--text);line-height:1.5;margin-bottom:18px;}
+  .og{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .opt{padding:12px 16px;border-radius:var(--rs);border:2px solid var(--border);background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:var(--text);transition:all 0.15s;text-align:left;}
+  .opt:hover{border-color:var(--sky);background:var(--sky-l);}
+  .opt:disabled{cursor:default;}
+  .opt.correct{border-color:var(--mint);background:var(--mint-l);color:var(--mint-d);}
+  .opt.wrong{border-color:var(--rose);background:var(--rose-l);color:var(--rose-d);}
+  .fb{border-radius:var(--rs);padding:11px 15px;margin-bottom:14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;display:none;}
+  .fb.show{display:block;}
+  .fb.correct{background:var(--mint-l);color:var(--mint-d);border-left:4px solid var(--mint);}
+  .fb.wrong{background:var(--rose-l);color:var(--rose-d);border-left:4px solid var(--rose);}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:var(--rs);border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.15s;}
+  .btn-p{background:linear-gradient(135deg,var(--rose),var(--purple));color:#fff;box-shadow:0 4px 14px rgba(232,68,90,0.3);}
+  .btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,68,90,0.4);}
+  .btn-s{background:#F3F4F6;color:var(--text);}
+  .btn-s:hover{background:var(--border);}
+  .fcw{perspective:1000px;margin:8px 0 18px;cursor:pointer;}
+  .fci{width:100%;min-height:170px;position:relative;transition:transform 0.5s ease;transform-style:preserve-3d;}
+  .fcw.flipped .fci{transform:rotateY(180deg);}
+  .fcf{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;border:2px solid var(--border);}
+  .fcfront{background:linear-gradient(135deg,#F0EBFF,#FFF0F2);}
+  .fcback{background:linear-gradient(135deg,#ECFDF5,#EFF6FF);transform:rotateY(180deg);position:absolute;top:0;left:0;}
+  .fcw2{font-family:'Nunito',sans-serif;font-weight:900;font-size:30px;color:var(--text);text-align:center;}
+  .fcu{font-size:11px;color:var(--muted);margin-top:5px;font-weight:600;}
+  .fch{font-size:12px;color:var(--muted);margin-top:8px;}
+  .fcm{font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:var(--mint-d);text-align:center;}
+  .fcl{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .mc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  .mcl{font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+  .mi{padding:11px 14px;border-radius:var(--rs);border:2px solid var(--border);background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:7px;transition:all 0.15s;}
+  .mi:hover{border-color:var(--sky);background:var(--sky-l);}
+  .mi.sel{border-color:var(--purple);background:var(--purple-l);color:var(--purple);}
+  .mi.mat{border-color:var(--mint);background:var(--mint-l);color:var(--mint-d);cursor:default;}
+  .mi.shk{border-color:var(--rose);background:var(--rose-l);animation:shake 0.4s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .fs{font-family:'Nunito',sans-serif;font-weight:700;font-size:17px;color:var(--text);line-height:2.2;margin-bottom:7px;}
+  .bi{border:none;border-bottom:3px solid var(--purple);background:transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:17px;color:var(--purple);padding:0 5px;width:150px;outline:none;text-align:center;}
+  .fhint{font-size:12px;color:var(--muted);margin:6px 0 16px;font-weight:600;}
+  .tofs{font-family:'Nunito',sans-serif;font-weight:800;font-size:18px;color:var(--text);line-height:1.5;text-align:center;margin:14px 0 24px;padding:18px;background:#F9FAFB;border-radius:var(--rs);border-left:5px solid var(--purple);}
+  .tob{display:flex;gap:14px;justify-content:center;margin-bottom:18px;}
+  .tb{flex:1;max-width:190px;padding:16px;border-radius:var(--rs);border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:800;font-size:17px;cursor:pointer;transition:all 0.15s;text-align:center;}
+  .tbt{background:#F0FFF4;color:var(--mint-d);}
+  .tbf{background:#FFF5F5;color:var(--rose-d);}
+  .tb:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .tb:disabled{cursor:default;transform:none;box-shadow:none;}
+  .tb.correct{border-color:var(--mint);background:var(--mint-l);}
+  .tb.wrong{border-color:var(--rose);background:var(--rose-l);}
+  .rs{text-align:center;padding:28px 16px;}
+  .rt{font-size:60px;margin-bottom:14px;}
+  .rsb{font-family:'Nunito',sans-serif;font-weight:900;font-size:48px;background:linear-gradient(135deg,var(--rose),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .rp{font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:var(--muted);margin:4px 0;}
+  .rm{font-family:'Nunito',sans-serif;font-weight:800;font-size:18px;color:var(--text);margin:10px 0 24px;}
+  .hs{max-width:740px;margin:0 auto;}
+  .hw{font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:var(--text);margin-bottom:5px;}
+  .hsu{color:var(--muted);font-size:14px;margin-bottom:24px;}
+  .hg{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;}
+  .ht{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;text-align:left;}
+  .ht:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);}
+  .hti{width:44px;height:44px;border-radius:11px;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .htn{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:var(--text);margin-bottom:3px;}
+  .htd{font-size:12px;color:var(--muted);}
+  .htc{margin-top:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;padding:3px 9px;border-radius:9px;display:inline-block;}
+  .sh{margin-top:28px;}
+  .sht{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;margin-bottom:10px;}
+  .sr{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--card);border-radius:var(--rs);margin-bottom:7px;box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+  .srn{font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;flex:1;}
+  .srv{font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;}
+  /* subject filter pills */
+  .subf{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .spill{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;background:#fff;color:var(--muted);transition:all 0.15s;}
+  .spill.on{color:#fff;}
+  @keyframes bounceIn{0%{transform:scale(0.9);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+  .bi-anim{animation:bounceIn 0.3s ease forwards;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-logo">WR</div>
+  <div><div class="topbar-title">White Rose — Grade 2 Learning Games</div></div>
+  <div class="topbar-right">
+    <div class="score-badge" id="gscore">⭐ 0 pts</div>
+  </div>
+</div>
+<div class="app">
+  <nav class="sidebar">
+    <div class="sl">Menu</div>
+    <button class="nb active" onclick="showHome()" id="nav-home"><div class="ni">🏠</div>Home</button>
+    <div class="sl">Games</div>
+    <button class="nb" onclick="startGame('flash')" id="nav-flash"><div class="ni">🃏</div><span>Word Flash</span><span class="nbadge">42</span></button>
+    <button class="nb" onclick="startGame('quiz')" id="nav-quiz"><div class="ni">❓</div><span>Quiz Time</span><span class="nbadge">60</span></button>
+    <button class="nb" onclick="startGame('match')" id="nav-match"><div class="ni">🔗</div><span>Match It</span><span class="nbadge">10+</span></button>
+    <button class="nb" onclick="startGame('fill')" id="nav-fill"><div class="ni">✏️</div><span>Fill Blank</span><span class="nbadge">12</span></button>
+    <button class="nb" onclick="startGame('tof')" id="nav-tof"><div class="ni">✅</div><span>True/False</span><span class="nbadge">42</span></button>
+    <div class="sl" style="margin-top:auto;">Info</div>
+    <div style="padding:8px 10px;font-size:11px;color:var(--muted);line-height:1.6;">Class Two · 1st Term<br>English · Science · SS · Urdu</div>
+  </nav>
+  <main class="main" id="mc"></main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const VOCAB=[
+  // English Units
+  {word:'Meal',meaning:'Food',unit:'English – Unit 1'},
+  {word:'Encourage',meaning:'Motivate',unit:'English – Unit 1'},
+  {word:'Possible',meaning:'Likely',unit:'English – Unit 1'},
+  {word:'Habits',meaning:'Nature',unit:'English – Unit 1'},
+  {word:'Available',meaning:'Obtainable',unit:'English – Unit 1'},
+  {word:'Bought',meaning:'Past of buy',unit:'English – Unit 2'},
+  {word:'Rode',meaning:'Past of ride',unit:'English – Unit 2'},
+  {word:'Rocks',meaning:'Stones',unit:'English – Unit 2'},
+  {word:'Silly',meaning:'Foolish',unit:'English – Unit 2'},
+  {word:'Behind',meaning:'At the back',unit:'English – Unit 2'},
+  {word:'Little',meaning:'Small',unit:'English – Unit 3'},
+  {word:'Heard',meaning:'Past of listen',unit:'English – Unit 3'},
+  {word:'Ill',meaning:'Sick',unit:'English – Unit 3'},
+  {word:'Close',meaning:'Near',unit:'English – Unit 3'},
+  {word:'Dancing',meaning:'Jumping',unit:'English – Unit 3'},
+  {word:'See',meaning:'Look',unit:'English – Unit 4'},
+  {word:'Give',meaning:'Offer',unit:'English – Unit 4'},
+  {word:'Nest',meaning:"Bird's home / Den",unit:'English – Unit 4'},
+  {word:'Lady',meaning:'Woman',unit:'English – Unit 4'},
+  {word:'Hat',meaning:'Cap',unit:'English – Unit 4'},
+  {word:'Night',meaning:'Dark time',unit:'English – Unit 5'},
+  {word:'Rush',meaning:'Run fast',unit:'English – Unit 5'},
+  {word:'Still',meaning:'Yet / not moving',unit:'English – Unit 5'},
+  {word:'Perhaps',meaning:'Maybe',unit:'English – Unit 5'},
+  {word:'Peeped',meaning:'Had a brief look',unit:'English – Unit 5'},
+  {word:'Move',meaning:'Walk',unit:'English – Unit 6'},
+  {word:'Remember',meaning:'Remind',unit:'English – Unit 6'},
+  {word:'Watch',meaning:'See / observe',unit:'English – Unit 6'},
+  {word:'Muttered',meaning:'Spoke unhappily',unit:'English – Unit 6'},
+  {word:'Think',meaning:'Thought / imagine',unit:'English – Extension'},
+  {word:'Wide',meaning:'Open / broad',unit:'English – Extension'},
+  {word:'Cattle',meaning:'Cows and bulls',unit:'English – Extension'},
+  {word:'Above',meaning:'High / over',unit:'English – Extension'},
+  {word:'Pleasantest',meaning:'Nicest / most fun',unit:'English – Extension'},
+  // Urdu
+  {word:'Khana (کھانا)',meaning:'Food / meal',unit:'Urdu'},
+  {word:'Dost (دوست)',meaning:'Friend',unit:'Urdu'},
+  {word:'Parossi (پڑوسی)',meaning:'Neighbour',unit:'Urdu'},
+  {word:'Aadat (عادت)',meaning:'Habit',unit:'Urdu'},
+  {word:'Dawat (دعوت)',meaning:'Invitation / feast',unit:'Urdu'},
+  {word:'Pani (پانی)',meaning:'Water',unit:'Urdu'},
+  {word:'Darakht (درخت)',meaning:'Tree',unit:'Urdu'},
+  {word:'Janwar (جانور)',meaning:'Animal',unit:'Urdu'},
+];
+
+const QUIZ=[
+  // English
+  {q:"What is the meaning of 'Encourage'?",opts:["To stop","To motivate","To eat","To sleep"],ans:1,sub:'English'},
+  {q:"Which word means 'Foolish'?",opts:["Rocks","Rode","Silly","Ill"],ans:2,sub:'English'},
+  {q:"'Peeped' means ___.",opts:["A long stare","A brief look","To run","To jump"],ans:1,sub:'English'},
+  {q:"What does 'Muttered' mean?",opts:["Shouted loudly","Happy speech","Spoke unhappily","Smiled and spoke"],ans:2,sub:'English'},
+  {q:"'Cattle' means ___.",opts:["Cats and dogs","Cows and bulls","Birds and fish","Only horses"],ans:1,sub:'English'},
+  {q:"The feminine of 'Lion' is ___.",opts:["Liones","Lioness","Cow","Doe"],ans:1,sub:'English'},
+  {q:"Which is a compound word?",opts:["Run","Apple","Watermelon","Sing"],ans:2,sub:'English'},
+  {q:"The past tense of 'buy' is ___.",opts:["Buyed","Buys","Boughted","Bought"],ans:3,sub:'English'},
+  {q:"'Sub-mar-ine' has ___ syllables.",opts:["1","2","3","4"],ans:2,sub:'English'},
+  {q:"'Above' means ___.",opts:["Below","Beside","Behind","High or over"],ans:3,sub:'English'},
+  {q:"Choose the correct possessive: 'These are ___ books.' (yourself)",opts:["his","her","my","their"],ans:2,sub:'English'},
+  {q:"Transition word for the FIRST action is ___.",opts:["Lastly","Secondly","Firstly","Finally"],ans:2,sub:'English'},
+  {q:"The feminine of 'Actor' is ___.",opts:["Actoress","Actress","Actrice","Actora"],ans:1,sub:'English'},
+  {q:"'Still' means ___.",opts:["Moving fast","Run","Yet / not moving","Always"],ans:2,sub:'English'},
+  {q:"'Close' means ___.",opts:["Far away","Open","Near","Wide"],ans:2,sub:'English'},
+  // Science
+  {q:"Where does a camel live?",opts:["Forest","Desert","Mountain","Ocean"],ans:1,sub:'Science'},
+  {q:"What does the stem of a plant do?",opts:["Makes seeds","Takes water to leaves","Stores food","Absorbs sunlight"],ans:1,sub:'Science'},
+  {q:"Which is a non-flowering plant?",opts:["Rose","Lily","Pine","Sunflower"],ans:2,sub:'Science'},
+  {q:"The young one of a frog is called ___.",opts:["Foal","Pupa","Tadpole","Cub"],ans:2,sub:'Science'},
+  {q:"What do plants need to grow?",opts:["Sand and wind","Ice and snow","Salt only","Soil, sunlight, air and water"],ans:3,sub:'Science'},
+  {q:"Which animal lives in a burrow?",opts:["Bird","Lion","Bear","Rabbit"],ans:3,sub:'Science'},
+  {q:"Where does a Markhor live?",opts:["Desert","Forest","Mountains","Ocean"],ans:2,sub:'Science'},
+  {q:"What are resources from the air?",opts:["Wood and crop","Seafood","Oxygen and electricity","Stones"],ans:2,sub:'Science'},
+  {q:"The young one of a horse is called ___.",opts:["Tadpole","Pupa","Foal","Cub"],ans:2,sub:'Science'},
+  {q:"What do plants provide for us?",opts:["Water","Soil","Oxygen","Sand"],ans:2,sub:'Science'},
+  {q:"The young one of a butterfly is called ___.",opts:["Foal","Pupa","Tadpole","Kitten"],ans:1,sub:'Science'},
+  {q:"Where does a Snow Leopard live?",opts:["Desert","Forest","Ocean","Mountain"],ans:3,sub:'Science'},
+  {q:"Which fruit has ONE seed?",opts:["Apple","Papaya","Mango","Watermelon"],ans:2,sub:'Science'},
+  {q:"How does water reach our homes?",opts:["Rain directly","Ocean to home","River → filtration plant → pipelines → home","Tube well to sky to home"],ans:2,sub:'Science'},
+  {q:"Leaf shapes include ___.",opts:["Only round","Only oval","Round, oval, heart-shaped, long","Only needle-shaped"],ans:2,sub:'Science'},
+  // Social Studies
+  {q:"Where does Mr. Raza Ali work?",opts:["School","Hospital","Bank","Shop"],ans:2,sub:'Social Studies'},
+  {q:"What do wool and fur clothes do?",opts:["Keep us cool","Keep us warm","Only look nice","Protect from rain"],ans:1,sub:'Social Studies'},
+  {q:"What is an igloo made of?",opts:["Wood logs","Straw and mud","Ice and snow","Bricks and cement"],ans:2,sub:'Social Studies'},
+  {q:"Wool comes from ___.",opts:["Goats","Cows","Sheep","Cotton plant"],ans:2,sub:'Social Studies'},
+  {q:"A Block Flat is ___.",opts:["A small hut","A big building with many floors","A log cabin","An igloo"],ans:1,sub:'Social Studies'},
+  {q:"Who builds walls with bricks?",opts:["Plumber","Carpenter","Electrician","Mason"],ans:3,sub:'Social Studies'},
+  {q:"Who fixes water pipes?",opts:["Mason","Plumber","Carpenter","Labourer"],ans:1,sub:'Social Studies'},
+  {q:"Cotton clothes are worn in ___ weather.",opts:["Cold","Hot","Rainy only","All seasons"],ans:1,sub:'Social Studies'},
+  {q:"Food from milk includes ___.",opts:["Bread and flour","Oil and chips","Cheese, yogurt and butter","Popcorn and cereal"],ans:2,sub:'Social Studies'},
+  {q:"A Yurt is made of ___.",opts:["Ice and snow","Straw and grass","Cloth, felt and wood","Brick and cement"],ans:2,sub:'Social Studies'},
+  {q:"A school rule that keeps us safe is ___.",opts:["Run in corridors","Leave things on floor","Walk in a row and listen to teacher","Fight with friends"],ans:2,sub:'Social Studies'},
+  // Urdu / Islamic
+  {q:"'Khana' (کھانا) means ___.",opts:["Water","Friend","Food","Book"],ans:2,sub:'Urdu'},
+  {q:"'Dost' (دوست) means ___.",opts:["Enemy","Teacher","Brother","Friend"],ans:3,sub:'Urdu'},
+  {q:"'Parossi' (پڑوسی) means ___.",opts:["Relative","Stranger","Teacher","Neighbour"],ans:3,sub:'Urdu'},
+  {q:"'Pani' (پانی) means ___.",opts:["Fire","Air","Water","Food"],ans:2,sub:'Urdu'},
+  {q:"Islam teaches us to share our ___ with others.",opts:["Homework","Food","School bag","Only pencils"],ans:1,sub:'Urdu'},
+  {q:"Hazrat Muhammad (SAW) always ate ___.",opts:["A lot","In moderation","Very little only","Only sweets"],ans:1,sub:'Urdu'},
+  {q:"'Darakht' (درخت) means ___.",opts:["River","Animal","Flower","Tree"],ans:3,sub:'Urdu'},
+  {q:"'Janwar' (جانور) means ___.",opts:["Plant","Building","Animal","Food"],ans:2,sub:'Urdu'},
+];
+
+const FILL=[
+  {b:"Piku bought",bl:"nine",a:"donkeys.",h:"How many donkeys?"},
+  {b:"The books are",bl:"in",a:"my bag.",h:"Preposition (inside)"},
+  {b:"My friends and I go to",bl:"the park",a:"every evening.",h:"Where they play"},
+  {b:"Two dogs chase the ball and",bl:"they",a:"run away with it.",h:"Pronoun for dogs"},
+  {b:"Miss Moppet was a little",bl:"kitten",a:"who loved chasing mice.",h:"What animal is she?"},
+  {b:"Ada sold eggs to a",bl:"lady",a:"on the bus.",h:"A woman"},
+  {b:"A mason builds walls with",bl:"brick",a:"and cement.",h:"Building material"},
+  {b:"Sports keeps us",bl:"fit",a:"and healthy.",h:"Benefit of sports"},
+  {b:"Salma likes bananas and",bl:"grapes",a:"for lunch.",h:"Last fruit in sentence"},
+  {b:"The swing is in the",bl:"garden",a:"near the house.",h:"Where is the swing?"},
+  {b:"The feminine of 'actor' is",bl:"actress",a:".",h:"Not actoress!"},
+  {b:"He",bl:"cleans",a:"his mouth after eating.",h:"3rd person singular present"},
+];
+
+const TOF=[
+  // English
+  {s:"'Watermelon' is a compound word.",ans:true,sub:'English'},
+  {s:"The feminine of 'actor' is 'actoress'.",ans:false,sub:'English'},
+  {s:"'Perhaps' means 'Maybe'.",ans:true,sub:'English'},
+  {s:"'Cattle' means only cows, not bulls.",ans:false,sub:'English'},
+  {s:"'Peeped' means to have a long stare.",ans:false,sub:'English'},
+  {s:"'Muttered' means to speak happily.",ans:false,sub:'English'},
+  {s:"'Sub-marine' has three syllables.",ans:true,sub:'English'},
+  {s:"The past tense of 'buy' is 'buyed'.",ans:false,sub:'English'},
+  {s:"'Firstly' is a transitional word.",ans:true,sub:'English'},
+  {s:"'Close' means 'Far away'.",ans:false,sub:'English'},
+  {s:"'Still' means 'Yet / not moving'.",ans:true,sub:'English'},
+  {s:"'Above' means 'Below'.",ans:false,sub:'English'},
+  {s:"The feminine of 'Lion' is 'Lioness'.",ans:true,sub:'English'},
+  {s:"'Rode' is the past tense of 'ride'.",ans:true,sub:'English'},
+  // Science
+  {s:"Plants provide us with oxygen.",ans:true,sub:'Science'},
+  {s:"Rain is a human-made source of water.",ans:false,sub:'Science'},
+  {s:"A tadpole is the young one of a frog.",ans:true,sub:'Science'},
+  {s:"The stem takes water to the roots.",ans:false,sub:'Science'},
+  {s:"Camels live in deserts.",ans:true,sub:'Science'},
+  {s:"Wind and water can generate electricity.",ans:true,sub:'Science'},
+  {s:"Filtering water makes it safe to drink.",ans:true,sub:'Science'},
+  {s:"A Snow Leopard lives in the forest.",ans:false,sub:'Science'},
+  {s:"Mango is a fruit with one seed.",ans:true,sub:'Science'},
+  {s:"Pine and Fir are flowering plants.",ans:false,sub:'Science'},
+  {s:"Ocean, Tube well and Dam are water sources.",ans:true,sub:'Science'},
+  {s:"Roots absorb water from the soil.",ans:true,sub:'Science'},
+  {s:"A Puppy is the young one of a dog.",ans:true,sub:'Science'},
+  {s:"Starfish and Octopus are domestic animals.",ans:false,sub:'Science'},
+  // Social Studies
+  {s:"Wool clothes keep us warm.",ans:true,sub:'Social Studies'},
+  {s:"An igloo is made of ice and snow.",ans:true,sub:'Social Studies'},
+  {s:"A Plumber builds walls with bricks.",ans:false,sub:'Social Studies'},
+  {s:"Cotton is used to make warm winter clothes.",ans:false,sub:'Social Studies'},
+  {s:"We get wool from cows.",ans:false,sub:'Social Studies'},
+  {s:"A mason builds walls with bricks and cement.",ans:true,sub:'Social Studies'},
+  {s:"A log cabin is made of wood logs.",ans:true,sub:'Social Studies'},
+  {s:"Ice cream is made from milk, sugar and cream.",ans:true,sub:'Social Studies'},
+  {s:"Doctors wear white coats only to look smart.",ans:false,sub:'Social Studies'},
+  {s:"Corn is used to make flour, oil and popcorn.",ans:true,sub:'Social Studies'},
+  // Urdu
+  {s:"'Khana' means Food.",ans:true,sub:'Urdu'},
+  {s:"'Dost' means Enemy.",ans:false,sub:'Urdu'},
+  {s:"Islam teaches us to share food with neighbours.",ans:true,sub:'Urdu'},
+  {s:"Hazrat Muhammad (SAW) ate very large meals.",ans:false,sub:'Urdu'},
+];
+
+const MATCH_SETS=[
+  {title:"Animals & Homes",
+   left:["Bird","Lion","Rabbit","Bear","Cow","Turtle","Snake","Bee","Horse","Eagle"],
+   right:["Nest","Den","Burrow","Cave","Barn","Shell","Hole","Hive","Stable","Nest (treetop)"]},
+  {title:"Words & Meanings",
+   left:["Meal","Silly","Close","Rush","Little","Lady","Nest","Watch"],
+   right:["Food","Foolish","Near","Run fast","Small","Woman","Den","See/Observe"]},
+  {title:"Workers & Jobs",
+   left:["Plumber","Mason","Carpenter","Electrician","Architect"],
+   right:["Fixes water pipes","Builds walls","Works with wood","Fixes electric wires","Designs buildings"]},
+  {title:"Young Ones",
+   left:["Horse","Frog","Butterfly","Dog","Cat","Cow"],
+   right:["Foal","Tadpole","Pupa","Puppy","Kitten","Calf"]},
+];
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let gpts=0, scores={}, state={}, curGame='home';
+
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function setNav(id){document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));const el=document.getElementById('nav-'+id);if(el)el.classList.add('active');}
+function addPts(n){gpts+=n;document.getElementById('gscore').textContent='⭐ '+gpts+' pts';}
+function mc(){return document.getElementById('mc');}
+
+// ═══════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════
+function showHome(){
+  curGame='home';setNav('home');
+  const games=[
+    {id:'flash',icon:'🃏',name:'Word Flash',desc:'Vocabulary flashcards',count:'42 words',c:'#8B5CF6',l:'#F5F3FF'},
+    {id:'quiz', icon:'❓',name:'Quiz Time', desc:'Science, English, SS & Urdu',count:'60 questions',c:'#3B82F6',l:'#EFF6FF'},
+    {id:'match',icon:'🔗',name:'Match It',  desc:'4 matching sets',count:'4 sets',c:'#10B981',l:'#ECFDF5'},
+    {id:'fill', icon:'✏️',name:'Fill Blank',desc:'English grammar',count:'12 sentences',c:'#F59E0B',l:'#FFFBEB'},
+    {id:'tof',  icon:'✅',name:'True/False',desc:'All subjects',count:'42 statements',c:'#E8445A',l:'#FFF0F2'},
+  ];
+  const srows=Object.entries(scores).map(([k,v])=>{
+    const g=games.find(x=>x.id===k);
+    return `<div class="sr"><span style="font-size:16px;">${g?.icon||'🎮'}</span>
+      <span class="srn">${g?.name||k}</span>
+      <span class="srv" style="color:${g?.c||'#8B5CF6'}">${v.s}/${v.t}</span>
+      <span style="font-size:12px;color:var(--muted)">${Math.round(v.s/v.t*100)}%</span></div>`;
+  }).join('');
+  mc().innerHTML=`<div class="hs bi-anim">
+    <div class="hw">👋 Hello, Champion!</div>
+    <div class="hsu">Choose a game to practise. Every correct answer earns points!</div>
+    <div class="hg">${games.map(g=>`
+      <div class="ht" onclick="startGame('${g.id}')" style="border-top:4px solid ${g.c};">
+        <div class="hti" style="background:${g.l};">${g.icon}</div>
+        <div class="htn">${g.name}</div>
+        <div class="htd">${g.desc}</div>
+        <div class="htc" style="background:${g.l};color:${g.c};">${g.count}</div>
+      </div>`).join('')}
+    </div>
+    ${srows?`<div class="sh"><div class="sht">📊 Your scores</div>${srows}</div>`:''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// FLASH
+// ═══════════════════════════════════════════════════
+function startGame(id){curGame=id;setNav(id);state={};
+  if(id==='flash')rFlash();else if(id==='quiz')rQuiz();
+  else if(id==='match')rMatch();else if(id==='fill')rFill();else if(id==='tof')rTof();}
+
+function rFlash(){
+  if(!state.words){
+    // subject filter
+    const sub=state.sub||'All';
+    let pool=VOCAB;
+    if(sub==='English')pool=VOCAB.filter(v=>v.unit.startsWith('English'));
+    else if(sub==='Urdu')pool=VOCAB.filter(v=>v.unit==='Urdu');
+    state.words=shuf(pool);
+  }
+  const idx=state.idx||0;
+  if(idx>=state.words.length){showResult('flash',state.score||0,state.words.length,'Word Flash');return;}
+  const w=state.words[idx],rev=state.revealed||false;
+  const pct=Math.round(idx/state.words.length*100);
+  const sub=state.sub||'All';
+  mc().innerHTML=`<div class="gc bi-anim">
+    <div class="gh"><div class="ghi" style="background:#F5F3FF;">🃏</div>
+      <div><div class="ght">Word Flash</div><div class="ghs">Click the card to reveal the meaning</div></div></div>
+    <div class="subf">
+      ${['All','English','Urdu'].map(s=>`<div class="spill ${sub===s?'on':''}" 
+        style="${sub===s?'background:var(--purple);border-color:var(--purple);':''}"
+        onclick="state.sub='${s}';state.words=null;state.idx=0;state.score=0;state.revealed=false;rFlash()">${s}</div>`).join('')}
+    </div>
+    <div class="pr">
+      <div class="pp">Card <span>${idx+1}</span> of <span>${state.words.length}</span></div>
+      <div class="pbw"><div class="pb" style="width:${pct}%"></div></div>
+      <div class="pp">Known: <span style="color:var(--mint-d)">${state.score||0}</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;">${w.unit}</div>
+    <div class="fcw ${rev?'flipped':''}" onclick="fcFlip()" style="min-height:170px;position:relative;">
+      <div class="fci">
+        <div class="fcf fcfront"><div class="fcl">English Word</div><div class="fcw2">${w.word}</div>
+          ${!rev?'<div class="fch">👆 Click to see meaning</div>':''}</div>
+        <div class="fcf fcback"><div class="fcl">Meaning</div><div class="fcm">${w.meaning}</div></div>
+      </div>
+    </div>
+    ${rev?`<div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-s" style="flex:1;" onclick="fcNext(false)">😕 Didn't know</button>
+      <button class="btn btn-p" style="flex:1;" onclick="fcNext(true)">✓ I knew it!</button>
+    </div>`:`<div style="color:var(--muted);font-size:12px;text-align:center;margin-top:7px;">Click the card above to flip</div>`}
+  </div>`;
+}
+function fcFlip(){if(!state.revealed){state.revealed=true;rFlash();}}
+function fcNext(knew){if(knew){addPts(5);state.score=(state.score||0)+1;}state.idx=(state.idx||0)+1;state.revealed=false;rFlash();}
+
+// ═══════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════
+function rQuiz(){
+  if(!state.qs){
+    const sub=state.sub||'All';
+    let pool=sub==='All'?QUIZ:QUIZ.filter(q=>q.sub===sub);
+    state.qs=shuf(pool).slice(0,12);
+  }
+  const idx=state.idx||0,score=state.score||0;
+  if(idx>=state.qs.length){showResult('quiz',score,state.qs.length,'Quiz Time');return;}
+  const q=state.qs[idx],ans=state.answered,chosen=state.chosen;
+  const pct=Math.round(idx/state.qs.length*100);
+  const sub=state.sub||'All';
+  mc().innerHTML=`<div class="gc bi-anim">
+    <div class="gh"><div class="ghi" style="background:#EFF6FF;">❓</div>
+      <div><div class="ght">Quiz Time</div><div class="ghs">${q.sub}</div></div></div>
+    <div class="subf">
+      ${['All','English','Science','Social Studies','Urdu'].map(s=>`<div class="spill ${sub===s?'on':''}"
+        style="${sub===s?'background:var(--sky);border-color:var(--sky);':''}"
+        onclick="state.sub='${s}';state.qs=null;state.idx=0;state.score=0;state.answered=false;rQuiz()">${s}</div>`).join('')}
+    </div>
+    <div class="pr">
+      <div class="pp">Q <span>${idx+1}</span> of <span>${state.qs.length}</span></div>
+      <div class="pbw"><div class="pb" style="width:${pct}%"></div></div>
+      <div class="pp">Score: <span style="color:var(--sky-d)">${score}</span></div>
+    </div>
+    <div class="qt">${q.q}</div>
+    <div class="og">${q.opts.map((o,i)=>`
+      <button class="opt ${ans?(i===q.ans?'correct':(i===chosen?'wrong':''))  :''}"
+        ${ans?'disabled':''} onclick="ansQ(${i})">${o}</button>`).join('')}</div>
+    <div class="fb ${ans?(chosen===q.ans?'correct':'wrong'):''} ${ans?'show':''}">
+      ${ans?(chosen===q.ans?'🎉 Correct! Well done!':'❌ Answer: '+q.opts[q.ans]):''}
+    </div>
+    ${ans?`<button class="btn btn-p" onclick="nxtQ()">Next question →</button>`:''}
+  </div>`;
+}
+function ansQ(i){const q=state.qs[state.idx||0];state.answered=true;state.chosen=i;if(i===q.ans){addPts(10);state.score=(state.score||0)+1;}rQuiz();}
+function nxtQ(){state.idx=(state.idx||0)+1;state.answered=false;state.chosen=undefined;rQuiz();}
+
+// ═══════════════════════════════════════════════════
+// MATCH
+// ═══════════════════════════════════════════════════
+function rMatch(){
+  if(!state.setIdx)state.setIdx=0;
+  if(!state.sets)state.sets=MATCH_SETS;
+  const si=state.setIdx;
+  const set=state.sets[si];
+  if(!state.pairs)state.pairs=shuf(set.left.map((l,i)=>({left:l,right:set.right[i]})));
+  if(!state.rights)state.rights=shuf(state.pairs.map(p=>p.right));
+  const matched=state.matched||[];
+  const selL=state.selL,selR=state.selR;
+  const done=matched.length===state.pairs.length;
+  const matchedRights=matched.map(l=>state.pairs.find(p=>p.left===l)?.right);
+
+  mc().innerHTML=`<div class="gc bi-anim">
+    <div class="gh"><div class="ghi" style="background:#ECFDF5;">🔗</div>
+      <div><div class="ght">Match It</div><div class="ghs">${set.title}</div></div></div>
+    <div class="subf">
+      ${state.sets.map((s,i)=>`<div class="spill ${si===i?'on':''}"
+        style="${si===i?'background:var(--mint);border-color:var(--mint);':''}"
+        onclick="state.setIdx=${i};state.pairs=null;state.rights=null;state.matched=[];state.selL=undefined;state.selR=undefined;rMatch()">${s.title}</div>`).join('')}
+    </div>
+    <div class="pr">
+      <div class="pp">Matched: <span style="color:var(--mint-d)">${matched.length}</span> of <span>${state.pairs.length}</span></div>
+      <div class="pbw"><div class="pb" style="width:${Math.round(matched.length/state.pairs.length*100)}%"></div></div>
+    </div>
+    ${done?`<div class="fb correct show">🎉 All matched! Excellent work!</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <button class="btn btn-s" onclick="state.pairs=null;state.rights=null;state.matched=[];state.selL=undefined;state.selR=undefined;rMatch()">🔄 Play again</button>
+        ${si<state.sets.length-1?`<button class="btn btn-p" onclick="state.setIdx=${si+1};state.pairs=null;state.rights=null;state.matched=[];state.selL=undefined;state.selR=undefined;rMatch()">Next set →</button>`:''}
+      </div>`:''}
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Tap one from each column to match.</div>
+    <div class="mc">
+      <div>
+        <div class="mcl">Column A</div>
+        ${state.pairs.map(p=>`<div class="mi ${matched.includes(p.left)?'mat':''} ${selL===p.left?'sel':''} ${state.wL===p.left?'shk':''}"
+          ${matched.includes(p.left)?'':` onclick="mSelL('${p.left}')"`}>${p.left}</div>`).join('')}
+      </div>
+      <div>
+        <div class="mcl">Column B</div>
+        ${state.rights.map(r=>`<div class="mi ${matchedRights.includes(r)?'mat':''} ${selR===r?'sel':''} ${state.wR===r?'shk':''}"
+          ${matchedRights.includes(r)?'':` onclick="mSelR('${r}')"`}>${r}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function mSelL(l){state.selL=l;state.wL=null;state.wR=null;if(state.selR)chkMatch();else rMatch();}
+function mSelR(r){state.selR=r;state.wL=null;state.wR=null;if(state.selL)chkMatch();else rMatch();}
+function chkMatch(){
+  const l=state.selL,r=state.selR;
+  const ok=state.pairs.find(p=>p.left===l&&p.right===r);
+  if(ok){state.matched=[...(state.matched||[]),l];addPts(15);}
+  else{state.wL=l;state.wR=r;setTimeout(()=>{state.wL=null;state.wR=null;rMatch();},500);}
+  state.selL=undefined;state.selR=undefined;rMatch();
+}
+
+// ═══════════════════════════════════════════════════
+// FILL
+// ═══════════════════════════════════════════════════
+function rFill(){
+  if(!state.qs)state.qs=shuf([...FILL]);
+  const idx=state.idx||0,score=state.score||0;
+  if(idx>=state.qs.length){showResult('fill',score,state.qs.length,'Fill the Blank');return;}
+  const q=state.qs[idx],ans=state.answered;
+  mc().innerHTML=`<div class="gc bi-anim">
+    <div class="gh"><div class="ghi" style="background:#FFFBEB;">✏️</div>
+      <div><div class="ght">Fill the Blank</div><div class="ghs">Type the missing word</div></div></div>
+    <div class="pr">
+      <div class="pp">Q <span>${idx+1}</span> of <span>${state.qs.length}</span></div>
+      <div class="pbw"><div class="pb" style="width:${Math.round(idx/state.qs.length*100)}%"></div></div>
+      <div class="pp">Score: <span style="color:var(--amber-d)">${score}</span></div>
+    </div>
+    <div class="fs">${q.b} <input class="bi" id="fi" placeholder="___" ${ans?'disabled':''}
+      onkeydown="if(event.key==='Enter')chkFill('${q.bl}')"
+      value="${ans?q.bl:''}"/> ${q.a}</div>
+    <div class="fhint">💡 Hint: ${q.h}</div>
+    <div class="fb ${ans?(state.correct?'correct':'wrong'):''} ${ans?'show':''}">
+      ${ans?(state.correct?'🎉 Correct!':'❌ Answer: <b>'+q.bl+'</b>'):''}
+    </div>
+    ${!ans?`<button class="btn btn-p" onclick="chkFill('${q.bl}')">Check →</button>`:''}
+    ${ans?`<button class="btn btn-p" onclick="nxtFill()">Next →</button>`:''}
+  </div>`;
+  if(!ans){const inp=document.getElementById('fi');if(inp)setTimeout(()=>inp.focus(),50);}
+}
+function chkFill(correct){
+  const val=(document.getElementById('fi')?.value||'').trim().toLowerCase();
+  state.answered=true;state.correct=val===correct.toLowerCase();
+  if(state.correct){addPts(10);state.score=(state.score||0)+1;}rFill();
+}
+function nxtFill(){state.idx=(state.idx||0)+1;state.answered=false;state.correct=false;rFill();}
+
+// ═══════════════════════════════════════════════════
+// TRUE/FALSE
+// ═══════════════════════════════════════════════════
+function rTof(){
+  if(!state.qs){
+    const sub=state.sub||'All';
+    let pool=sub==='All'?TOF:TOF.filter(q=>q.sub===sub);
+    state.qs=shuf(pool).slice(0,12);
+  }
+  const idx=state.idx||0,score=state.score||0;
+  if(idx>=state.qs.length){showResult('tof',score,state.qs.length,'True/False');return;}
+  const q=state.qs[idx],ans=state.answered,chosen=state.chosen;
+  const sub=state.sub||'All';
+  mc().innerHTML=`<div class="gc bi-anim">
+    <div class="gh"><div class="ghi" style="background:#FFF0F2;">✅</div>
+      <div><div class="ght">True or False</div><div class="ghs">${q.sub}</div></div></div>
+    <div class="subf">
+      ${['All','English','Science','Social Studies','Urdu'].map(s=>`<div class="spill ${sub===s?'on':''}"
+        style="${sub===s?'background:var(--rose);border-color:var(--rose);':''}"
+        onclick="state.sub='${s}';state.qs=null;state.idx=0;state.score=0;state.answered=false;rTof()">${s}</div>`).join('')}
+    </div>
+    <div class="pr">
+      <div class="pp">Q <span>${idx+1}</span> of <span>${state.qs.length}</span></div>
+      <div class="pbw"><div class="pb" style="width:${Math.round(idx/state.qs.length*100)}%"></div></div>
+      <div class="pp">Score: <span style="color:var(--rose-d)">${score}</span></div>
+    </div>
+    <div class="tofs">"${q.s}"</div>
+    <div class="tob">
+      <button class="tb tbt ${ans?(q.ans===true?'correct':(chosen===true?'wrong':''))  :''}"
+        ${ans?'disabled':''} onclick="ansTof(true)">✓ True</button>
+      <button class="tb tbf ${ans?(q.ans===false?'correct':(chosen===false?'wrong':''))  :''}"
+        ${ans?'disabled':''} onclick="ansTof(false)">✗ False</button>
+    </div>
+    <div class="fb ${ans?(chosen===q.ans?'correct':'wrong'):''} ${ans?'show':''}">
+      ${ans?(chosen===q.ans
+        ?'🎉 Correct! That is '+(q.ans?'True':'False')+'.'
+        :'❌ This is actually <b>'+(q.ans?'True':'False')+'</b>.'):''}
+    </div>
+    ${ans?`<button class="btn btn-p" onclick="nxtTof()">Next →</button>`:''}
+  </div>`;
+}
+function ansTof(val){const q=state.qs[state.idx||0];state.answered=true;state.chosen=val;if(val===q.ans){addPts(10);state.score=(state.score||0)+1;}rTof();}
+function nxtTof(){state.idx=(state.idx||0)+1;state.answered=false;state.chosen=undefined;rTof();}
+
+// ═══════════════════════════════════════════════════
+// RESULT
+// ═══════════════════════════════════════════════════
+function showResult(gid,score,total,name){
+  scores[gid]={s:score,t:total};
+  const pct=Math.round(score/total*100);
+  const trophy=pct>=80?'🏆':pct>=50?'🥈':'🎯';
+  const stars=pct>=80?'⭐⭐⭐':pct>=60?'⭐⭐':'⭐';
+  const msg=pct>=80?'Outstanding! You are a superstar!'
+           :pct>=60?'Great effort! Keep practising!'
+           :pct>=40?'Good try! Study and try again!'
+           :'Keep going — you can do it! 😊';
+  mc().innerHTML=`<div class="gc bi-anim"><div class="rs">
+    <div class="rt">${trophy}</div>
+    <div style="font-size:28px;margin-bottom:8px;">${stars}</div>
+    <div class="rsb">${score} / ${total}</div>
+    <div class="rp">${pct}% correct</div>
+    <div class="rm">${msg}</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-s" onclick="startGame('${gid}')">🔄 Play again</button>
+      <button class="btn btn-p" onclick="showHome()">🏠 Home →</button>
+    </div>
+  </div></div>`;
+}
+
+showHome();
+</script>
+</body>
+</html>
